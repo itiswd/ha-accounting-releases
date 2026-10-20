@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HA Accounting Download</title>
+  <meta name="description" content="Download HA Accounting for Windows. Install once — the app keeps itself up to date after that.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --text: #0f1b3d;
+      --muted: #44506b;
+      --line: #e3e8f2;
+      --brand: #0b47c9;
+      --brand-hover: #0a3aa6;
+      --navy: #003380;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 548px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--brand);
+      border-radius: 10px;
+      padding: 40px 40px 34px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(15, 27, 61, 0.06);
+    }
+    .logo { width: 176px; height: auto; display: block; margin: 0 auto 26px; }
+    h1 { font-size: 27px; font-weight: 800; margin: 0 0 6px; }
+    .tagline { color: var(--muted); font-size: 17px; margin: 0 0 30px; }
+    .download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 6px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .download:hover { background: var(--brand-hover); }
+    .download:active { transform: translateY(1px); }
+    .download svg { width: 20px; height: 20px; flex: none; }
+    .meta { color: var(--muted); font-size: 14px; margin: 14px 0 0; min-height: 21px; }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0 22px; }
+    .note { text-align: left; color: var(--muted); font-size: 14px; line-height: 1.75; margin: 0; }
+    .note b { color: var(--text); }
+    .note + .note { margin-top: 10px; }
+    @media (max-width: 480px) {
+      .card { padding: 30px 20px 26px; }
+      h1 { font-size: 23px; }
+      .tagline { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="logo" src="logo.png" alt="HA Accounting">
+    <h1>HA Accounting for Windows</h1>
+    <p class="tagline">Install once — the app keeps itself up to date after that.</p>
+
+    <a id="download" class="download"
+       href="https://github.com/itiswd/ha-accounting-releases/releases/latest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>
+      </svg>
+      <span id="label">Download the latest version</span>
+    </a>
+    <p id="meta" class="meta">&nbsp;</p>
+
+    <hr>
+    <p class="note">
+      Already using HA Accounting? Close the app and install this <b>over</b> it —
+      do not uninstall first. Your data is kept and backed up automatically.
+    </p>
+    <p class="note">
+      If Windows shows “Windows protected your PC”, choose <b>More info</b> then
+      <b>Run anyway</b>. Requires Windows 10 or 11 (64-bit).
+    </p>
+  </main>
+
+  <script>
+    // Always point at the newest published full setup, so this page never
+    // needs editing when a release is published.
+    (async () => {
+      try {
+        const res = await fetch(
+          'https://api.github.com/repos/itiswd/ha-accounting-releases/releases/latest',
+          { headers: { Accept: 'application/vnd.github+json' } });
+        if (!res.ok) return;
+        const release = await res.json();
+        const setup = (release.assets || []).find(
+          (a) => /^HA_Accounting_Setup_.*\.exe$/i.test(a.name));
+        if (!setup) return;
+        const version = release.tag_name.replace(/^v/i, '');
+        const sizeMb = (setup.size / (1024 * 1024)).toFixed(1);
+        const date = new Date(release.published_at).toLocaleDateString('en-US');
+        document.getElementById('download').href = setup.browser_download_url;
+        document.getElementById('label').textContent = `Download version ${version}`;
+        document.getElementById('meta').textContent = `${sizeMb} MB · Released ${date}`;
+      } catch (_) {
+        // Offline/API limit: the button still opens the latest release page.
+      }
+    })();
+  </script>
+</body>
+</html>
